@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import axios from "axios"; // for network call API
 
 interface ITodo {
   id: number;
@@ -15,6 +16,45 @@ interface ITodo {
 const TodoPage = () => {
   const [todos, setTodos] = useState<ITodo[]>([]);
   const inputTaskRef = useRef<HTMLInputElement>(null);
+
+  // axios promise version
+  const onBtCreateTodo = () => {
+    axios
+      .post("https://zealouscolor-us.backendless.app/api/data/todos", {
+        todo: inputTaskRef.current?.value,
+        isDone: false,
+      })
+      .then((response) => {
+        // Jika berhasil tambah data, response akan diterima oleh then melalui cbfn
+        console.log("RESPONSE API AFTER ADD DATA", response.data);
+
+        alert(`Add task: ${response.data.todo} success`);
+      })
+      .catch((error) => {
+        // Jika gagal tambah data, response akan diterima sebagai error dan masuk kedalam catch
+        console.log(error);
+      });
+  };
+
+  // axios async/await
+  const getTodos = async () => {
+    try {
+      // - get data from backendless table
+      const response = await axios.get(
+        "https://zealouscolor-us.backendless.app/api/data/todos"
+      );
+      console.log("RESPONSE FROM DB", response.data);
+
+      // - store data to useState (todos, setTodos)
+      setTodos(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getTodos();
+  }, []);
 
   return (
     <div>
@@ -45,7 +85,11 @@ const TodoPage = () => {
                 className="py-6 border-none shadow-none"
                 ref={inputTaskRef}
               />
-              <Button type="button" className="absolute top-1/7 right-4">
+              <Button
+                type="button"
+                className="absolute top-1/7 right-4"
+                onClick={onBtCreateTodo}
+              >
                 Add Task
               </Button>
             </div>
