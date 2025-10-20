@@ -7,15 +7,36 @@ import { Moon, Sun, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios"; // for network call API
+import { useFormik } from "formik";
+import { inputTodoSchema } from "./schema/inputTodo.schema";
 
 interface ITodo {
   objectId: string;
   todo: string;
   isDone: boolean;
 }
+
+interface IFormTodo {
+  todo: string;
+}
+
 const TodoPage = () => {
   const [todos, setTodos] = useState<ITodo[]>([]);
   const inputTaskRef = useRef<HTMLInputElement>(null);
+
+  // input initialValue
+  const initialValues: IFormTodo = {
+    todo: "",
+  };
+
+  // useFormik setup
+  const formik = useFormik({
+    initialValues,
+    validationSchema: inputTodoSchema,
+    onSubmit: async (values) => {
+      console.log("DATA FROM INPUT: ", values);
+    },
+  });
 
   // axios promise version
   const onBtCreateTodo = () => {
@@ -100,21 +121,27 @@ const TodoPage = () => {
       <div className="w-[40rem] m-auto flex flex-col items-center">
         <Card className="w-full mt-[-50px] z-50 bg-white shadow-lg">
           <CardContent>
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="Create a new todo..."
-                className="py-6 border-none shadow-none"
-                ref={inputTaskRef}
-              />
-              <Button
-                type="button"
-                className="absolute top-1/7 right-4"
-                onClick={onBtCreateTodo}
-              >
-                Add Task
-              </Button>
-            </div>
+            <form onSubmit={formik.handleSubmit}>
+              <div className="relative">
+                <Input
+                  id="todo"
+                  name="todo"
+                  type="text"
+                  placeholder="Create a new todo..."
+                  className="py-6 border-none shadow-none"
+                  onChange={formik.handleChange}
+                  value={formik.values.todo}
+                />
+                <Button type="submit" className="absolute top-1/7 right-4">
+                  Add Task
+                </Button>
+              </div>
+              {formik.touched.todo ? (
+                <span className="text-red-500">{formik.errors.todo}</span>
+              ) : (
+                ""
+              )}
+            </form>
           </CardContent>
         </Card>
 
