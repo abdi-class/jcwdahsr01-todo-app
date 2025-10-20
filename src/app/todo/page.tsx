@@ -35,20 +35,21 @@ const TodoPage = () => {
     validationSchema: inputTodoSchema,
     onSubmit: async (values) => {
       console.log("DATA FROM INPUT: ", values);
+      onBtCreateTodo(values.todo);
     },
   });
 
   // axios promise version
-  const onBtCreateTodo = () => {
+  const onBtCreateTodo = (todo: string) => {
     axios
       .post("https://zealouscolor-us.backendless.app/api/data/todos", {
-        todo: inputTaskRef.current?.value,
+        todo,
         isDone: false,
       })
       .then((response) => {
         // Jika berhasil tambah data, response akan diterima oleh then melalui cbfn
         console.log("RESPONSE API AFTER ADD DATA", response.data);
-
+        getTodos();
         alert(`Add task: ${response.data.todo} success`);
       })
       .catch((error) => {
