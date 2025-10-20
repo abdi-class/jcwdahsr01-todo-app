@@ -9,8 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios"; // for network call API
 
 interface ITodo {
-  id: number;
-  task: string;
+  objectId: string;
+  todo: string;
   isDone: boolean;
 }
 const TodoPage = () => {
@@ -56,6 +56,28 @@ const TodoPage = () => {
     getTodos();
   }, []);
 
+  const printTodos = () => {
+    return todos.map((value: ITodo) => {
+      return (
+        <li
+          key={value.objectId}
+          className="flex items-center justify-between py-2 boder-b"
+        >
+          <div className="flex items-center gap-5">
+            <Checkbox
+              className="rounded-full w-6 h-6 border-2 border-gray-300"
+              checked={value.isDone}
+            />
+            <span>{value.todo}</span>
+          </div>
+          <Button type="button" className="p-0 w-8 h-8 rounded-full">
+            <Trash />
+          </Button>
+        </li>
+      );
+    });
+  };
+
   return (
     <div>
       <div
@@ -98,7 +120,7 @@ const TodoPage = () => {
 
         <Card className="w-full mt-4 shadow-lg">
           <CardContent className="p-5">
-            <ul></ul>
+            <ul>{printTodos()}</ul>
 
             <div className="flex justify-between text-sm text-gray-500 mt-4">
               <span>0 items left</span>
